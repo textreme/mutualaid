@@ -28,10 +28,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header>
-          <nav>
-            <Link href="/">Mutual Aid</Link>
-          </nav>
+        <header className="flex justify-between items-center min-h-[80px] p-8 sm:p-8">
+        <Link href="/" className="flex items-center">
+            <span className="text-lg font-semibold">Mutual Aid Live</span>
+          </Link>
+
+          {/* Center: Navbar Text */}
+          <div className="text-center">
+            <h1 className="text-lg font-semibold">CA Wildfires</h1>
+          </div>
+
+          {/* Right: Hamburger Menu */}
+          <Link href="/account" className="flex items-center">
+          <span className="text-lg font-semibold">+</span>
+          </Link>
         </header>
         {children}
       </body>

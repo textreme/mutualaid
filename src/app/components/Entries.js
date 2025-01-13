@@ -11,7 +11,8 @@ const Entries = () => {
   const [user, setUser] = useState("");
   const [needsList, setNeedsList] = useState([]);
   const [filteredNeeds, setFilteredNeeds] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "timestamp", order: "desc" });
 
   // Fetch predefined categories from Firestore
   useEffect(() => {
@@ -52,23 +53,6 @@ const Entries = () => {
 
     fetchNeeds();
   }, []);
-
-  // Handle search
-  useEffect(() => {
-    if (searchTerm === "") {
-      setFilteredNeeds(needsList); // Reset to all needs
-    } else {
-      const lowerCaseSearch = searchTerm.toLowerCase();
-      setFilteredNeeds(
-        needsList.filter(
-          (need) =>
-            need.entry.toLowerCase().includes(lowerCaseSearch) ||
-            need.category.toLowerCase().includes(lowerCaseSearch) ||
-            need.user.toLowerCase().includes(lowerCaseSearch)
-        )
-      );
-    }
-  }, [searchTerm, needsList]);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -125,16 +109,17 @@ const Entries = () => {
     }
   };
 
-  // Handle sorting
-  const handleSort = (key, order = "asc") => {
+  // Handle dynamic sorting
+  const handleSort = (key) => {
+    const newOrder = sortConfig.key === key && sortConfig.order === "asc" ? "desc" : "asc";
+    setSortConfig({ key, order: newOrder });
+
     const sortedNeeds = [...filteredNeeds].sort((a, b) => {
       if (key === "timestamp") {
-        return order === "asc"
-          ? a.timestamp - b.timestamp
-          : b.timestamp - a.timestamp;
+        return newOrder === "asc" ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
       }
       if (key === "category") {
-        return order === "asc"
+        return newOrder === "asc"
           ? a.category.localeCompare(b.category)
           : b.category.localeCompare(a.category);
       }
@@ -143,92 +128,148 @@ const Entries = () => {
     setFilteredNeeds(sortedNeeds);
   };
 
+  // Handle search
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    const lowercasedTerm = term.toLowerCase();
+    const searchedNeeds = needsList.filter(
+      (need) =>
+        need.category.toLowerCase().includes(lowercasedTerm) ||
+        need.entry.toLowerCase().includes(lowercasedTerm) ||
+        need.user.toLowerCase().includes(lowercasedTerm)
+    );
+    setFilteredNeeds(searchedNeeds);
+  };
+
   return (
-    <div>
-      <h3>Search Needs</h3>
-      <div>
-        <input
-          type="text"
-          placeholder="Search by need, category, or user..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="text-black border p-2 w-full"
-        />
-      </div>
-      <h3>Submit a Need</h3>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Category:
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="text-black">
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Need:
+    <div className="space-y-8">
+      {/* Needs Entry Section */}
+      <section className="p-4 rounded shadow-md">
+        <h3 className="text-xl font-semibold mb-4">Submit a Need</h3>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-wrap gap-4 items-center justify-start"
+        >
+          {/* Category Input */}
+          <label className="flex flex-col w-40">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="text-black p-2 border rounded"
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.id}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {/* Need Input */}
+          <label className="flex flex-col flex-grow">
+            <input
+              type="text"
+              value={need}
+              onChange={(e) => setNeed(e.target.value)}
+              placeholder="Describe your need"
+              className="text-black p-2 border rounded"
+            />
+          </label>
+
+          {/* User Input */}
+          <label className="flex flex-col w-40">
+            <input
+              type="text"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+              placeholder="Contact"
+              className="text-black p-2 border rounded"
+            />
+          </label>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="p-2 border border-white rounded text-white"
+          >
+            Submit
+          </button>
+        </form>
+      </section>
+
+      {/* Needs List Section */}
+      <section className="p-4 rounded shadow-md">
+        <h3 className="text-xl font-semibold mb-4">Needs</h3>
+        <div className="flex justify-between items-center mb-4">
+          {/* Filter */}
+          <label className="flex items-center gap-2">
+            <span className="text-sm font-medium">Filter by </span>
+            <select
+              onChange={(e) => handleFilterByCategory(e.target.value)}
+              className="text-black p-2 border rounded"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.id}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {/* Sort Options */}
+          <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">Sort by </span>
+            <button
+              onClick={() => handleSort("category")}
+              className="border border-gray-300 rounded px-4 py-1 flex items-center gap-2"
+            >
+              Category {sortConfig.key === "category" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
+            </button>
+            <button
+              onClick={() => handleSort("timestamp")}
+              className="border border-gray-300 rounded px-4 py-1 flex items-center gap-2"
+            >
+              Time {sortConfig.key === "timestamp" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
+            </button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="mb-4">
           <input
             type="text"
-            value={need}
-            onChange={(e) => setNeed(e.target.value)}
-            placeholder="Describe your need"
-            className="text-black"/>
-        </label>
-        <label>
-          User:
-          <input
-            type="text"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            placeholder="Contact" className="text-black"
+            placeholder="Search Needs"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+            onChange={(e) => handleSearch(e.target.value)}
           />
-        </label>
-        <button type="submit" className="border border-gray-300 rounded">Submit</button>
-      </form>
+        </div>
 
-      <h3>Filter and Sort</h3>
-      <div>
-        <label>
-          Filter by Category:
-          <select
-            onChange={(e) => handleFilterByCategory(e.target.value)}
-            className="text-black">
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        Sort by:
-        Category:
-        <button onClick={() => handleSort("category", "asc")} className="border border-gray-300 rounded">&darr;A-Z</button>
-        <button onClick={() => handleSort("category", "desc")} className="border border-gray-300 rounded">&uarr;Z-A</button>
-        Time:
-        <button onClick={() => handleSort("timestamp", "asc")} className="border border-gray-300 rounded">&darr;Oldest First</button>
-        <button onClick={() => handleSort("timestamp", "desc")} className="border border-gray-300 rounded">&uarr;Newest First</button>
-      </div>
+{/* Needs List */}
+<ul className="space-y-2 mt-4">
+  {filteredNeeds.length > 0 ? (
+    filteredNeeds.map((item) => (
+      <li key={item.id} className="p-2 rounded">
+        <div className="flex justify-between">
+          {/* Left-aligned category and entry */}
+          <div>
+            <strong>{item.category}:</strong> {item.entry}
+          </div>
+          {/* Right-aligned user and timestamp */}
+          <div className="text-right">
+            <p>{item.user}</p>
+            <p>{formatTimestamp(item.timestamp)}</p>
+          </div>
+        </div>
+      </li>
+    ))
+  ) : (
+    <p>No entries available.</p>
+  )}
+</ul>
 
-      <h3>Needs List</h3>
-      {filteredNeeds.length > 0 ? (
-        <ul>
-          {filteredNeeds.map((item) => (
-            <li key={item.id}>
-              <strong>{item.category}:</strong> {item.entry} by {item.user} on {" "}
-              {formatTimestamp(item.timestamp)}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No entries available.</p>
-      )}
+      </section>
     </div>
   );
 };
