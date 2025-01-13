@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { db } from "@/app/utils/firebase";
-import { collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  serverTimestamp,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
 const Entries = () => {
   const [categories, setCategories] = useState([]);
@@ -14,14 +21,11 @@ const Entries = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "timestamp", order: "desc" });
 
-  // Fetch predefined categories from Firestore
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "categories"));
-        const categoriesData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-        }));
+        const categoriesData = querySnapshot.docs.map((doc) => ({ id: doc.id }));
         setCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -31,21 +35,22 @@ const Entries = () => {
     fetchCategories();
   }, []);
 
-  // Fetch needs from Firestore and convert timestamps
   useEffect(() => {
     const fetchNeeds = async () => {
       try {
-        const querySnapshot = await getDocs(query(collection(db, "needs"), orderBy("timestamp", "desc")));
+        const querySnapshot = await getDocs(
+          query(collection(db, "needs"), orderBy("timestamp", "desc"))
+        );
         const needsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             id: doc.id,
             ...data,
-            timestamp: data.timestamp?.toDate() || null, // Convert Firestore timestamp to Date
+            timestamp: data.timestamp?.toDate() || null,
           };
         });
         setNeedsList(needsData);
-        setFilteredNeeds(needsData); // Initialize filteredNeeds
+        setFilteredNeeds(needsData);
       } catch (error) {
         console.error("Error fetching needs:", error);
       }
@@ -54,7 +59,6 @@ const Entries = () => {
     fetchNeeds();
   }, []);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedCategory || !need || !user) {
@@ -67,68 +71,29 @@ const Entries = () => {
         category: selectedCategory,
         entry: need,
         user: user,
-        timestamp: serverTimestamp(), // Add timestamp
+        timestamp: serverTimestamp(),
       });
 
-      alert("Need submitted successfully!");
-
-      setNeed("");
-      setUser("");
-      setSelectedCategory("");
-
-      // Add new entry to needsList with placeholder timestamp
       const newEntry = {
         id: newDoc.id,
         category: selectedCategory,
         entry: need,
         user: user,
-        timestamp: new Date(), // Temporary timestamp
+        timestamp: new Date(),
       };
-      setNeedsList((prevNeeds) => [newEntry, ...prevNeeds]);
-      setFilteredNeeds((prevNeeds) => [newEntry, ...prevNeeds]);
+      setNeedsList((prev) => [newEntry, ...prev]);
+      setFilteredNeeds((prev) => [newEntry, ...prev]);
+
+      setNeed("");
+      setUser("");
+      setSelectedCategory("");
+      alert("Need submitted successfully!");
     } catch (error) {
       console.error("Error submitting need:", error);
       alert("Failed to submit need.");
     }
   };
 
-  // Format the timestamp for display
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return "N/A";
-    return timestamp instanceof Date
-      ? timestamp.toLocaleString()
-      : new Date(timestamp).toLocaleString();
-  };
-
-  // Handle filtering by category
-  const handleFilterByCategory = (category) => {
-    if (category === "") {
-      setFilteredNeeds(needsList); // Reset to all needs
-    } else {
-      setFilteredNeeds(needsList.filter((need) => need.category === category));
-    }
-  };
-
-  // Handle dynamic sorting
-  const handleSort = (key) => {
-    const newOrder = sortConfig.key === key && sortConfig.order === "asc" ? "desc" : "asc";
-    setSortConfig({ key, order: newOrder });
-
-    const sortedNeeds = [...filteredNeeds].sort((a, b) => {
-      if (key === "timestamp") {
-        return newOrder === "asc" ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
-      }
-      if (key === "category") {
-        return newOrder === "asc"
-          ? a.category.localeCompare(b.category)
-          : b.category.localeCompare(a.category);
-      }
-      return 0;
-    });
-    setFilteredNeeds(sortedNeeds);
-  };
-
-  // Handle search
   const handleSearch = (term) => {
     setSearchTerm(term);
     const lowercasedTerm = term.toLowerCase();
@@ -141,57 +106,81 @@ const Entries = () => {
     setFilteredNeeds(searchedNeeds);
   };
 
+  const handleFilterByCategory = (category) => {
+    if (category === "") {
+      setFilteredNeeds(needsList);
+    } else {
+      setFilteredNeeds(needsList.filter((need) => need.category === category));
+    }
+  };
+
+  const handleSort = (key) => {
+    const order =
+      sortConfig.key === key && sortConfig.order === "asc" ? "desc" : "asc";
+    setSortConfig({ key, order });
+    const sortedNeeds = [...filteredNeeds].sort((a, b) => {
+      if (key === "timestamp") {
+        return order === "asc"
+          ? a.timestamp - b.timestamp
+          : b.timestamp - a.timestamp;
+      }
+      if (key === "category") {
+        return order === "asc"
+          ? a.category.localeCompare(b.category)
+          : b.category.localeCompare(a.category);
+      }
+      return 0;
+    });
+    setFilteredNeeds(sortedNeeds);
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "N/A";
+    return timestamp instanceof Date
+      ? timestamp.toLocaleString()
+      : new Date(timestamp).toLocaleString();
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="grid gap-8">
       {/* Needs Entry Section */}
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Submit a Need</h3>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-wrap gap-4 items-center justify-start"
+          className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr_0.5fr] gap-4 items-center"
         >
-          {/* Category Input */}
-          <label className="flex flex-col w-40">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-black p-2 border rounded"
-            >
-              <option value="">Select a category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.id}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          {/* Need Input */}
-          <label className="flex flex-col flex-grow">
-            <input
-              type="text"
-              value={need}
-              onChange={(e) => setNeed(e.target.value)}
-              placeholder="Describe your need"
-              className="text-black p-2 border rounded"
-            />
-          </label>
-
-          {/* User Input */}
-          <label className="flex flex-col w-40">
-            <input
-              type="text"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              placeholder="Contact"
-              className="text-black p-2 border rounded"
-            />
-          </label>
-
-          {/* Submit Button */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="p-2 border rounded text-black"
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.id}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={need}
+            onChange={(e) => setNeed(e.target.value)}
+            placeholder="Describe your need"
+            className="p-2 border rounded text-black"
+          />
+          <input
+            type="text"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            placeholder="Contact"
+            className="p-2 border rounded text-black"
+          />
           <button
             type="submit"
-            className="p-2 border border-white rounded text-white"
+            className="p-2 border border-white rounded text-white hover:bg-gray-700"
           >
             Submit
           </button>
@@ -201,74 +190,65 @@ const Entries = () => {
       {/* Needs List Section */}
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
-        <div className="flex justify-between items-center mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_1fr] items-center gap-4 mb-4">
           {/* Filter */}
-          <label className="flex items-center gap-2">
-            <span className="text-sm font-medium">Filter by </span>
-            <select
-              onChange={(e) => handleFilterByCategory(e.target.value)}
-              className="text-black p-2 border rounded"
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.id}
-                </option>
-              ))}
-            </select>
-          </label>
+          <select
+            onChange={(e) => handleFilterByCategory(e.target.value)}
+            className="p-2 border rounded text-black"
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.id}
+              </option>
+            ))}
+          </select>
 
-          {/* Sort Options */}
-          <div className="flex items-center gap-4">
-          <span className="text-sm font-medium">Sort by </span>
-            <button
+          {/* Search */}
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Search needs or users..."
+            className="p-2 border rounded text-black"
+          />
+
+          {/* Sort */}
+          <div className="flex justify-end gap-2">
+            {/*<button
               onClick={() => handleSort("category")}
-              className="border border-gray-300 rounded px-4 py-1 flex items-center gap-2"
+              className="p-2 border rounded hover:bg-gray-200"
             >
               Category {sortConfig.key === "category" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
-            </button>
+            </button> */}
             <button
               onClick={() => handleSort("timestamp")}
-              className="border border-gray-300 rounded px-4 py-1 flex items-center gap-2"
+              className="p-2 border rounded hover:bg-gray-200"
             >
               Time {sortConfig.key === "timestamp" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
             </button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search Needs"
-            className="w-full p-2 border border-gray-300 rounded text-black"
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
-
-{/* Needs List */}
-<ul className="space-y-2 mt-4">
-  {filteredNeeds.length > 0 ? (
-    filteredNeeds.map((item) => (
-      <li key={item.id} className="p-2 rounded">
-        <div className="flex justify-between">
-          {/* Left-aligned category and entry */}
-          <div>
-            <strong>{item.category}:</strong> {item.entry}
-          </div>
-          {/* Right-aligned user and timestamp */}
-          <div className="text-right">
-            <p>{item.user}</p>
-            <p>{formatTimestamp(item.timestamp)}</p>
-          </div>
-        </div>
-      </li>
-    ))
-  ) : (
-    <p>No entries available.</p>
-  )}
-</ul>
-
+        {/* Needs List */}
+        <ul className="grid gap-2">
+          {filteredNeeds.length > 0 ? (
+            filteredNeeds.map((item) => (
+              <li
+                key={item.id}
+                className="grid grid-cols-[1fr_2fr_1fr] items-center border p-2 rounded"
+              >
+                <span>{item.category}</span>
+                <span className="text-left">{item.entry}</span>
+                <span className="text-right text-gray-500">
+                  {item.user} <br /> {formatTimestamp(item.timestamp)}
+                </span>
+              </li>
+            ))
+          ) : (
+            <p>No entries available.</p>
+          )}
+        </ul>
       </section>
     </div>
   );
