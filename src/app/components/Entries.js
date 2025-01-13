@@ -11,6 +11,7 @@ const Entries = () => {
   const [user, setUser] = useState("");
   const [needsList, setNeedsList] = useState([]);
   const [filteredNeeds, setFilteredNeeds] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   // Fetch predefined categories from Firestore
   useEffect(() => {
@@ -51,6 +52,23 @@ const Entries = () => {
 
     fetchNeeds();
   }, []);
+
+  // Handle search
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredNeeds(needsList); // Reset to all needs
+    } else {
+      const lowerCaseSearch = searchTerm.toLowerCase();
+      setFilteredNeeds(
+        needsList.filter(
+          (need) =>
+            need.entry.toLowerCase().includes(lowerCaseSearch) ||
+            need.category.toLowerCase().includes(lowerCaseSearch) ||
+            need.user.toLowerCase().includes(lowerCaseSearch)
+        )
+      );
+    }
+  }, [searchTerm, needsList]);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -127,6 +145,16 @@ const Entries = () => {
 
   return (
     <div>
+      <h3>Search Needs</h3>
+      <div>
+        <input
+          type="text"
+          placeholder="Search by need, category, or user..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="text-black border p-2 w-full"
+        />
+      </div>
       <h3>Submit a Need</h3>
       <form onSubmit={handleSubmit}>
         <label>
@@ -134,7 +162,7 @@ const Entries = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-          >
+            className="text-black">
             <option value="">Select a category</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
@@ -150,7 +178,7 @@ const Entries = () => {
             value={need}
             onChange={(e) => setNeed(e.target.value)}
             placeholder="Describe your need"
-          />
+            className="text-black"/>
         </label>
         <label>
           User:
@@ -158,10 +186,10 @@ const Entries = () => {
             type="text"
             value={user}
             onChange={(e) => setUser(e.target.value)}
-            placeholder="Enter your name"
+            placeholder="Contact" className="text-black"
           />
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit" className="border border-gray-300 rounded">Submit</button>
       </form>
 
       <h3>Filter and Sort</h3>
@@ -170,7 +198,7 @@ const Entries = () => {
           Filter by Category:
           <select
             onChange={(e) => handleFilterByCategory(e.target.value)}
-          >
+            className="text-black">
             <option value="">All Categories</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
@@ -179,11 +207,13 @@ const Entries = () => {
             ))}
           </select>
         </label>
-
-        <button onClick={() => handleSort("category", "asc")}>Sort by Category (A-Z)</button>
-        <button onClick={() => handleSort("category", "desc")}>Sort by Category (Z-A)</button>
-        <button onClick={() => handleSort("timestamp", "asc")}>Sort by Timestamp (Oldest First)</button>
-        <button onClick={() => handleSort("timestamp", "desc")}>Sort by Timestamp (Newest First)</button>
+        Sort by:
+        Category:
+        <button onClick={() => handleSort("category", "asc")} className="border border-gray-300 rounded">&darr;A-Z</button>
+        <button onClick={() => handleSort("category", "desc")} className="border border-gray-300 rounded">&uarr;Z-A</button>
+        Time:
+        <button onClick={() => handleSort("timestamp", "asc")} className="border border-gray-300 rounded">&darr;Oldest First</button>
+        <button onClick={() => handleSort("timestamp", "desc")} className="border border-gray-300 rounded">&uarr;Newest First</button>
       </div>
 
       <h3>Needs List</h3>
