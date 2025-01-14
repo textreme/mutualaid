@@ -19,10 +19,7 @@ const Entries = () => {
   const [needsList, setNeedsList] = useState([]);
   const [filteredNeeds, setFilteredNeeds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({
-    key: "timestamp",
-    order: "desc",
-  });
+  const [sortConfig, setSortConfig] = useState({ key: "timestamp", order: "desc" });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -151,7 +148,7 @@ const Entries = () => {
         <h3 className="text-xl font-semibold mb-4">Submit a Need</h3>
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 sm:grid-cols-[1fr_4fr_1fr_0.5fr] gap-4 items-center"
+          className="grid grid-cols-1 sm:grid-cols-[0.5fr_2.5fr_0.25fr_0.25fr] gap-4 items-center"
         >
           <select
             value={selectedCategory}
@@ -167,18 +164,32 @@ const Entries = () => {
               </option>
             ))}
           </select>
+          <div className="relative">
+            <input
+              type="text"
+              value={need}
+              onChange={(e) => {
+                if (e.target.value.length <= 98) {
+                  setNeed(e.target.value);
+                }
+              }}
+              placeholder="Describe your need, be specific (max 98 characters)"
+              className="p-2 border rounded text-black w-full"
+            />
+            <p className="text-sm text-gray-500 absolute right-2 top-2">
+              {98 - need.length} chars left
+            </p>
+          </div>
           <input
-            type="text"
-            value={need}
-            onChange={(e) => setNeed(e.target.value)}
-            placeholder="Describe your need"
-            className="p-2 border rounded text-black"
-          />
-          <input
-            type="text"
+            type="tel"
             value={user}
-            onChange={(e) => setUser(e.target.value)}
-            placeholder="Contact"
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+              if (value.length <= 10) {
+                setUser(value);
+              }
+            }}
+            placeholder="123-456-7890"
             className="p-2 border rounded text-black"
           />
           <button
@@ -194,7 +205,7 @@ const Entries = () => {
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
         {/* Filter/Search/Sort */}
-        <div className="grid grid-cols-1 sm:grid-cols-[1fr_4fr_1.5fr_0.5fr] gap-4 items-center">
+        <div className="grid grid-cols-[0.5fr_2fr_1fr_0.25fr] gap-4 items-center">
           <select
             onChange={(e) => handleFilterByCategory(e.target.value)}
             className="text-black p-2 border rounded"
@@ -214,9 +225,7 @@ const Entries = () => {
             placeholder="Search category, needs or users..."
             className="text-black p-2 border rounded"
           />
-
-          <div className="hidden sm:block"></div>
-
+          <div></div>
           <button
             onClick={() => handleSort("timestamp")}
             className="text-white border border-white rounded px-4 py-2"
@@ -226,12 +235,12 @@ const Entries = () => {
         </div>
 
         {/* Needs Entries */}
-        <ul className="grid gap-2 mt-4">
+        <ul className="grid gap-2">
           {filteredNeeds.length > 0 ? (
             filteredNeeds.map((item) => (
               <li
                 key={item.id}
-                className="grid grid-cols-1 sm:grid-cols-[1fr_4fr_1fr_1fr] items-center gap-4 p-2 rounded"
+                className="grid grid-cols-[0.5fr_2.5fr_0.5fr_0.75fr] items-center gap-4 p-2 rounded"
               >
                 <span className="truncate">{item.category}</span>
                 <span className="truncate">{item.entry}</span>
