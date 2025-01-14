@@ -148,7 +148,7 @@ const Entries = () => {
         <h3 className="text-xl font-semibold mb-4">Submit a Need</h3>
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr_0.5fr] gap-4 items-center"
+          className="grid grid-cols-1 sm:grid-cols-[1fr_4fr_1fr_0.5fr] gap-4 items-center"
         >
           <select
             value={selectedCategory}
@@ -190,7 +190,7 @@ const Entries = () => {
       {/* Needs List Section */}
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_1fr] items-center gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-[0.5fr_3fr_1fr] items-center gap-4 mb-4">
           {/* Filter */}
           <select
             onChange={(e) => handleFilterByCategory(e.target.value)}
@@ -209,7 +209,7 @@ const Entries = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search needs or users..."
+            placeholder="Search category, needs or users..."
             className="p-2 border rounded text-black"
           />
 
@@ -230,26 +230,27 @@ const Entries = () => {
           </div>
         </div>
 
-        {/* Needs List */}
-        <ul className="grid gap-2">
-          {filteredNeeds.length > 0 ? (
-            filteredNeeds.map((item) => (
-              <li
-                key={item.id}
-                className="grid grid-cols-[1fr_2fr_1fr] items-center p-2 rounded"
-              >
-                <span>{item.category}</span>
-                <span className="text-left">{item.entry}</span>
-                <span className="text-right text-gray-500">
-                  {item.user} <br /> {formatTimestamp(item.timestamp)}
-                </span>
-              </li>
-            ))
-          ) : (
-            <p>No entries available.</p>
-          )}
-        </ul>
-      </section>
+  {/* Needs Entries */}
+  <ul className="grid gap-2">
+    {filteredNeeds.length > 0 ? (
+      filteredNeeds.map((item) => (
+        <li
+          key={item.id}
+          className="grid grid-cols-[1fr_6fr_2fr_2fr] items-center gap-4 p-2 rounded"
+        >
+          <span className="truncate">{item.category}</span>
+          <span className="truncate">{item.entry}</span>
+          <span className="text-right truncate">{item.user}</span>
+          <span className="text-right truncate">
+            {formatTimestamp(item.timestamp)}
+          </span>
+        </li>
+      ))
+    ) : (
+      <p>No entries available.</p>
+    )}
+  </ul>
+</section>
     </div>
   );
 };
