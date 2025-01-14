@@ -124,11 +124,6 @@ const Entries = () => {
           ? a.timestamp - b.timestamp
           : b.timestamp - a.timestamp;
       }
-      if (key === "category") {
-        return order === "asc"
-          ? a.category.localeCompare(b.category)
-          : b.category.localeCompare(a.category);
-      }
       return 0;
     });
     setFilteredNeeds(sortedNeeds);
@@ -148,7 +143,7 @@ const Entries = () => {
         <h3 className="text-xl font-semibold mb-4">Submit a Need</h3>
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 sm:grid-cols-[1fr_4fr_1fr_0.5fr] gap-4 items-center"
+          className="grid grid-cols-[1fr_4fr_2fr_1fr] gap-4 items-center"
         >
           <select
             value={selectedCategory}
@@ -190,11 +185,11 @@ const Entries = () => {
       {/* Needs List Section */}
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
-        <div className="grid grid-cols-1 md:grid-cols-[0.5fr_3fr_1fr] items-center gap-4 mb-4">
-          {/* Filter */}
+        {/* Filter/Search/Sort */}
+        <div className="grid grid-cols-[1fr_4fr_2fr_1fr] gap-4 items-center">
           <select
             onChange={(e) => handleFilterByCategory(e.target.value)}
-            className="p-2 border rounded text-black"
+            className="text-black p-2 border rounded"
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
@@ -204,53 +199,43 @@ const Entries = () => {
             ))}
           </select>
 
-          {/* Search */}
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search category, needs or users..."
-            className="p-2 border rounded text-black"
+            className="text-black p-2 border rounded"
           />
-
-          {/* Sort */}
-          <div className="flex justify-end gap-2">
-            {/*<button
-              onClick={() => handleSort("category")}
-              className="p-2 border rounded hover:bg-gray-200"
-            >
-              Category {sortConfig.key === "category" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
-            </button> */}
-            <button
-              onClick={() => handleSort("timestamp")}
-              className="p-2 border rounded hover:bg-gray-200"
-            >
-              Time {sortConfig.key === "timestamp" && (sortConfig.order === "asc" ? "⬆" : "⬇")}
-            </button>
-          </div>
+                    <div></div>
+          <button
+            onClick={() => handleSort("timestamp")}
+            className="text-white border border-white rounded px-4 py-2"
+          >
+            Time {sortConfig.order === "asc" ? "⬆" : "⬇"}
+          </button>
         </div>
 
-  {/* Needs Entries */}
-  <ul className="grid gap-2">
-    {filteredNeeds.length > 0 ? (
-      filteredNeeds.map((item) => (
-        <li
-          key={item.id}
-          className="grid grid-cols-[1fr_6fr_2fr_2fr] items-center gap-4 p-2 rounded"
-        >
-          <span className="truncate">{item.category}</span>
-          <span className="truncate">{item.entry}</span>
-          <span className="text-right truncate">{item.user}</span>
-          <span className="text-right truncate">
-            {formatTimestamp(item.timestamp)}
-          </span>
-        </li>
-      ))
-    ) : (
-      <p>No entries available.</p>
-    )}
-  </ul>
-</section>
+        {/* Needs Entries */}
+        <ul className="grid gap-2 mt-4">
+          {filteredNeeds.length > 0 ? (
+            filteredNeeds.map((item) => (
+              <li
+                key={item.id}
+                className="grid grid-cols-[1fr_4fr_2fr_1fr] items-center gap-4 p-2 rounded"
+              >
+                <span className="truncate">{item.category}</span>
+                <span className="truncate text-left">{item.entry}</span>
+                <span className="truncate text-right">{item.user}</span>
+                <span className="truncate text-right">
+                  {formatTimestamp(item.timestamp)}
+                </span>
+              </li>
+            ))
+          ) : (
+            <p>No entries available.</p>
+          )}
+        </ul>
+      </section>
     </div>
   );
 };
