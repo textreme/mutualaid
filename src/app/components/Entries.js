@@ -205,7 +205,7 @@ const Entries = () => {
       <section className="p-4 rounded shadow-md">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
         {/* Filter/Search/Sort */}
-        <div className="grid grid-cols-[0.5fr_2fr_1fr_0.25fr] gap-4 items-center">
+        <div className="grid grid-cols-[0.5fr_2fr_1fr_0.25fr] gap-4 items-center pb-4">
           <select
             onChange={(e) => handleFilterByCategory(e.target.value)}
             className="text-black p-2 border rounded"
@@ -242,10 +242,10 @@ const Entries = () => {
                 key={item.id}
                 className="grid grid-cols-[0.5fr_2.5fr_0.5fr_0.75fr] items-center gap-4 p-2 rounded"
               >
-                <span className="truncate">{item.category}</span>
-                <span className="truncate">{item.entry}</span>
-                <span className="text-right truncate">{item.user}</span>
-                <span className="text-right truncate">
+                <span className="whitespace-normal break-words">{item.category}</span>
+                <span className="whitespace-normal break-words">{item.entry}</span>
+                <span className="whitespace-normal break-words text-right">{item.user}</span>
+                <span className="whitespace-normal break-words text-right">
                   {formatTimestamp(item.timestamp)}
                 </span>
               </li>
