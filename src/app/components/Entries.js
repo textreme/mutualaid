@@ -236,7 +236,7 @@ const Entries = () => {
             filteredNeeds.map((item) => (
               <li
                 key={item.id}
-                className="grid grid-cols-[1fr_2fr_1fr] items-center border p-2 rounded"
+                className="grid grid-cols-[1fr_2fr_1fr] items-center p-2 rounded"
               >
                 <span>{item.category}</span>
                 <span className="text-left">{item.entry}</span>
