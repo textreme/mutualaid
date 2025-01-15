@@ -202,7 +202,7 @@ const Entries = () => {
       </section>
 
       {/* Needs List Section */}
-      <section className="p-4 rounded shadow-md">
+      <section className="p-4 rounded">
         <h3 className="text-xl font-semibold mb-4">Needs</h3>
         {/* Filter/Search/Sort */}
         <div className="grid grid-cols-[0.5fr_2fr_1fr_0.25fr] gap-4 items-center pb-4">
