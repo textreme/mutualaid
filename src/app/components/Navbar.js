@@ -27,7 +27,7 @@ const Navbar = () => {
       </Link>
 
       {/* Center: Alt Text */}
-      <span className="text-center font-bold">{altText || ""}</span>
+      <span className="text-center">{altText || ""}</span>
 
       {/* Right: Rotating Button */}
       <button
