@@ -1,21 +1,30 @@
 "use client";
-  
-import Navbar from "./Navbar";
 
-const UserAccount = () => {
+import { useEffect } from "react";
+import { useNavBarContext } from "@/app/context/NavBarContext";
+
+export default function UserAccount() {
+  const { setAltText } = useNavBarContext();
+
+  useEffect(() => {
+    setAltText("User Account");
+    return () => setAltText("");
+  }, [setAltText]);
+
   return (
-    <div>
-      <Navbar isAccountPage={true} />
-      <div className="p-6 bg-white text-black">
-        <h1 className="text-2xl font-bold">Your Account</h1>
-        <p>Manage your account settings and preferences here.</p>
-        <button className="mt-4 px-4 py-2 bg-black text-white rounded">
-          Logout
-        </button>
-      </div>
+    <div className="min-h-screen bg-white text-black p-6">
+      <h1 className="text-3xl font-bold">User Account</h1>
+      <p className="mt-4">
+        Welcome to your account page. Here you can manage your settings and preferences.
+      </p>
+      <p className="mt-2">
+        Additional text on this page will also be styled as black, ensuring readability.
+      </p>
+      <ul className="mt-4 list-disc list-inside">
+        <li>Manage your profile</li>
+        <li>Update account settings</li>
+        <li>View recent activity</li>
+      </ul>
     </div>
   );
-};
-
-export default UserAccount;
-  
+}

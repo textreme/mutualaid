@@ -1,18 +1,21 @@
 "use client";
-
-import Link from "next/link";
+import { useEffect } from "react";
+import { useNavBarContext } from "@/app/context/NavBarContext";
+import Entries from "@/app/components/Entries";
 import Image from "next/image";
 
-export default function Home() {
+export default function CAWildfires() {
+  const { setAltText } = useNavBarContext();
+
+  useEffect(() => {
+    setAltText("CA Wildfires"); // Set the navbar's center text
+    return () => setAltText(""); // Clear the text when unmounting
+  }, [setAltText]);
+
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Link
-          href="/cawildfires"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-        >
-          Go to CA Wildfires
-        </Link>
+        <Entries />
       </main>
       <footer className="row-start-3 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center w-full">
         <a
