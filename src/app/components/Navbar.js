@@ -7,22 +7,19 @@ const Navbar = () => {
   const [isAccountPageOpen, setIsAccountPageOpen] = useState(false);
 
   const toggleAccountPage = () => {
-    console.log("Button clicked!"); // Log the button click
-    setIsAccountPageOpen((prev) => {
-      console.log("Previous state:", prev); // Log the previous state
-      return !prev;
-    });
+    setIsAccountPageOpen((prev) => !prev);
   };
-  
 
   return (
     <div className="relative">
       {/* Navbar */}
-      <nav className="flex justify-between items-center p-4 pl-24 pr-24">
+      <nav className="flex justify-between items-center p-4 text-white w-full fixed top-0 z-10">
         {/* Logo */}
-        <Link href="/" className="font-semibold">
+        <Link href="/" className="text-l font-semibold">
           Mutual Aid Live
         </Link>
+
+        <span className="text-l">CA Wildfires</span>
 
         {/* Toggle Button */}
         <button
@@ -50,14 +47,17 @@ const Navbar = () => {
               onClick={toggleAccountPage}
               className="text-black text-2xl transform hover:text-gray-700 transition-colors"
             >
-              ✕
+              +
             </button>
           </div>
 
           {/* Content */}
           <div className="p-4 flex-grow">
-            <p>Welcome to your account page!</p>
-            {/* Add more account-related content here */}
+            <h1 className="text-2xl font-bold">Your Account</h1>
+            <p>Manage your account settings and preferences here.</p>
+            <button className="mt-4 px-4 py-2 bg-black text-white rounded">
+              Logout
+            </button>
           </div>
         </div>
       </div>

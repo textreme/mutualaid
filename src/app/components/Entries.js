@@ -227,11 +227,13 @@ const Entries = () => {
           />
           <div></div>
           <button
-            onClick={() => handleSort("timestamp")}
-            className="text-white border border-white rounded px-4 py-2"
-          >
-            Time {sortConfig.order === "asc" ? "⬆" : "⬇"}
-          </button>
+  onClick={() => handleSort("timestamp")}
+  className="text-white border border-white rounded px-4 py-2 flex items-center space-x-1"
+>
+  <span>Time</span>
+  <span>{sortConfig.order === "asc" ? "⬆" : "⬇"}</span>
+</button>
+
         </div>
 
         {/* Needs Entries */}
