@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useNavBarContext } from "@/app/context/NavBarContext";
+import LinkGoogleButton from "@/app/components/LinkGoogleButton";
 
 export default function UserAccount() {
   const { setAltText } = useNavBarContext();
@@ -25,6 +26,7 @@ export default function UserAccount() {
         <li>Update account settings</li>
         <li>View recent activity</li>
       </ul>
+      <LinkGoogleButton />
     </div>
   );
 }

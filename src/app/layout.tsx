@@ -3,10 +3,15 @@
 import { NavBarProvider } from "@/app/context/NavBarContext";
 import Navbar from "@/app/components/Navbar";
 import { useAnonymousAuth } from "@/app/hooks/useAnonymousAuth";
-import { useEffect } from "react";
+import AuthRedirectHandler from "@/app/components/AuthRedirectHandler"; // Import the handler
+import { useEffect, ReactNode } from "react";
 import "./globals.css";
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   const { authenticate } = useAnonymousAuth();
 
   useEffect(() => {
@@ -18,6 +23,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen">
         <NavBarProvider>
           <Navbar />
+          <AuthRedirectHandler /> {/* Handle redirect results */}
           {children}
         </NavBarProvider>
       </body>
