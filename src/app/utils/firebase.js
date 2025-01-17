@@ -1,15 +1,26 @@
+console.log("Environment Variables:", {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+});
+
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-
+console.log("API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDa2TdfLLAqeml98gdY0VH7yTmAQwRII4k",
-  authDomain: "mutual-aid-live.firebaseapp.com",
-  projectId: "mutual-aid-live",
-  storageBucket: "mutual-aid-live.firebasestorage.app",
-  messagingSenderId: "104879718817",
-  appId: "1:104879718817:web:470bbe2c3ef1176ea80be0",
-  measurementId: "G-3YSE0KFFQB",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -19,12 +30,11 @@ console.log("Firebase initialized:", app);
 // Initialize Services
 const db = getFirestore(app);
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider(); // Ensure googleProvider is defined
+
 setPersistence(auth, browserLocalPersistence)
   .then(() => console.log("Firebase auth persistence set to local."))
   .catch((error) => console.error("Error setting persistence:", error));
-
-// Google Auth Provider
-const googleProvider = new GoogleAuthProvider();
 
 // Emulator Configuration
 if (typeof window !== "undefined" && window.location.hostname === "localhost") {
@@ -33,4 +43,5 @@ if (typeof window !== "undefined" && window.location.hostname === "localhost") {
   connectFirestoreEmulator(db, "localhost", 8080);
 }
 
+// Export Services
 export { auth, db, googleProvider };

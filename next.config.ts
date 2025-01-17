@@ -1,11 +1,13 @@
-import type { NextConfig } from "next";
+import dotenv from "dotenv";
 
-const nextConfig: NextConfig = {
-  reactStrictMode: true, // Enables strict mode for React
-  trailingSlash: true,  // Adds trailing slashes to all routes
-  output: "export",     // Configures Next.js for static export
+dotenv.config();
+
+const nextConfig = {
+  reactStrictMode: true,
+  trailingSlash: true,
+  output: "export",
   images: {
-    unoptimized: true,  // Required for static exports if using next/image
+    unoptimized: true,
   },
 };
 
