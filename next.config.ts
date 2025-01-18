@@ -4,11 +4,8 @@ dotenv.config();
 
 const nextConfig = {
   reactStrictMode: true,
-  trailingSlash: true,
   output: "export",
-  images: {
-    unoptimized: true,
-  },
+  trailingSlash: true, // Ensures proper routing for static export
 };
 
 export default nextConfig;
