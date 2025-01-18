@@ -3,15 +3,23 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation"; // Navigation helpers
 import { useNavBarContext } from "@/app/context/NavBarContext";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const { altText } = useNavBarContext();
   const router = useRouter();
   const pathname = usePathname();
+  const [isAccountPage, setIsAccountPage] = useState(false);
 
-  const isAccountPage = pathname === "/account";
+  useEffect(() => {
+    // Normalize pathname to handle trailing slashes
+    const normalizedPath = pathname.replace(/\/$/, ""); // Remove trailing slash
+    console.log("Normalized pathname:", normalizedPath);
+    setIsAccountPage(normalizedPath === "/account");
+  }, [pathname]);
 
   const handleButtonClick = () => {
+    console.log("Button clicked, navigating:", isAccountPage ? "back" : "/account");
     if (isAccountPage) {
       router.back(); // Close user account page
     } else {
