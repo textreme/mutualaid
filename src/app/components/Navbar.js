@@ -1,43 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation"; // Navigation helpers
+import { useRouter } from "next/navigation";
 import { useNavBarContext } from "@/app/context/NavBarContext";
-import { useEffect, useState } from "react";
+import { auth } from "@/app/utils/firebase";
 
 const Navbar = () => {
-  const { altText } = useNavBarContext();
+  const { altText, isAccountPage } = useNavBarContext();
   const router = useRouter();
-  const pathname = usePathname();
-  const [isAccountPage, setIsAccountPage] = useState(false);
 
-  useEffect(() => {
-    // Normalize pathname to handle trailing slashes
-    const normalizedPath = pathname.replace(/\/$/, ""); // Remove trailing slash
-    console.log("Normalized pathname:", normalizedPath);
-    setIsAccountPage(normalizedPath === "/account");
-  }, [pathname]);
+  const handleButtonClick = async () => {
+    const currentUser = auth.currentUser;
 
-  const handleButtonClick = () => {
-    console.log("Button clicked, navigating:", isAccountPage ? "back" : "/account");
     if (isAccountPage) {
-      router.back(); // Close user account page
+      router.push("/"); // Navigate to homepage
+    } else if (currentUser && !currentUser.isAnonymous) {
+      router.push(`/account/${currentUser.uid}`); // Redirect to profile page
     } else {
-      router.push("/account"); // Open user account page
+      router.push("/account"); // Redirect to account creation
     }
   };
 
   return (
     <nav className="flex justify-between items-center p-4 bg-inherit text-white w-full fixed top-0 z-10">
-      {/* Left: Logo */}
       <Link href="/" className="font-semibold">
         Mutual Aid Live
       </Link>
-
-      {/* Center: Alt Text */}
       <span className="text-center">{altText || ""}</span>
-
-      {/* Right: Rotating Button */}
       <button
         onClick={handleButtonClick}
         className={`text-2xl font-bold transform transition-transform duration-300 ${

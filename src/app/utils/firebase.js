@@ -1,18 +1,16 @@
-console.log("Environment Variables:", {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-});
-
+import "dotenv/config";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  setPersistence,
+  browserLocalPersistence,
+  signOut,
+} from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+
 console.log("API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-// Firebase configuration
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -23,25 +21,40 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-console.log("Firebase initialized:", app);
-
-// Initialize Services
-const db = getFirestore(app);
 const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider(); // Ensure googleProvider is defined
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
-setPersistence(auth, browserLocalPersistence)
-  .then(() => console.log("Firebase auth persistence set to local."))
-  .catch((error) => console.error("Error setting persistence:", error));
+export const saveUserData = async (userId, data) => {
+  try {
+    const docRef = doc(db, "users", userId);
+    await setDoc(docRef, data);
+    console.log(`User data saved successfully for userId: ${userId}`);
+  } catch (error) {
+    console.error("Error saving user data:", error);
+  }
+};
 
-// Emulator Configuration
-if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-  console.log("Using Firebase Emulators");
-  connectAuthEmulator(auth, "http://localhost:9099");
-  connectFirestoreEmulator(db, "localhost", 8080);
-}
+export const getUserData = async (userId) => {
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists() ? docSnap.data() : null;
+  } catch (error) {
+    console.error("Error retrieving user data:", error);
+    return null;
+  }
+};
 
-// Export Services
+export const clearSessionAndSignOut = async () => {
+  try {
+    console.log("Signing out and clearing session...");
+    await signOut(auth);
+    console.log("Successfully signed out and cleared session.");
+  } catch (error) {
+    console.error("Error signing out and clearing session:", error);
+  }
+};
+
 export { auth, db, googleProvider };
